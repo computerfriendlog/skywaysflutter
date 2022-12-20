@@ -1,18 +1,23 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+
 //import 'package:url_launcher/url_launcher.dart';
-//import 'package:geolocator/geolocator.dart';
+import 'package:geolocator/geolocator.dart';
+
 //import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 //import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 //import 'package:geocoding/geocoding.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:geocoding/geocoding.dart';
+import '../Helper/CountryCodes.dart';
 
 //import '../APIs/APICalls.dart';
 //import '../Services/LocalNotificationService.dart';
+Placemark? myAdress;
 
 class Helper {
-  /*static Position currentPositon = Position(
+  static Position currentPositon = Position(
       longitude: 33.6163723,
       latitude: 72.8059114,
       timestamp: DateTime.now(),
@@ -20,7 +25,7 @@ class Helper {
       altitude: 1,
       heading: 1,
       speed: 1,
-      speedAccuracy: 1);*/
+      speedAccuracy: 1);
   static String currentAddress = '';
 
   static Future<bool> isInternetAvailble() async {
@@ -52,7 +57,7 @@ class Helper {
     return logout;
   }
 
- /* static Future<void> makePhoneCall(String phoneNumber) async {
+  /* static Future<void> makePhoneCall(String phoneNumber) async {
     final Uri launchUri = Uri(
       scheme: 'tel',
       path: phoneNumber,
@@ -71,48 +76,53 @@ class Helper {
     }
   }*/
 
-  /*static Future<Position> determineCurrentPosition() async {
+  static Future<Position> determineCurrentPosition() async {
     bool serviceEnabled;
     LocationPermission permission;
     // Test if location services are enabled.
-    print('0.......');
+    //print('0.......');
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       await Geolocator.openLocationSettings();
       return Future.error('Location services are disabled.');
     }
-    print('1.......');
+    //print('1.......');
 
     permission = await Geolocator.checkPermission();
-    print('2.......');
+    //print('2.......');
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         return Future.error('Location permissions are denied');
       }
     }
-    print('4.......');
+    // print('4.......');
 
     if (permission == LocationPermission.deniedForever) {
-      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
     }
-    print('5.......');
-    try{
-      currentPositon = await Geolocator.getCurrentPosition(timeLimit: Duration(seconds: 6));
-    }catch(e){
-      print('6.......');
+    //print('5.......');
+    try {
+      currentPositon = await Geolocator.getCurrentPosition(
+          timeLimit: const Duration(seconds: 6));
+    } catch (e) {
+      print('6.......$e');
     }
-    print('7.......');
 
-    // List<Placemark> placemarks = await placemarkFromCoordinates(
-    //     currentPositon.latitude, currentPositon.longitude);
-    // print('current address ');
-    // print(placemarks[0].name);
-    // Placemark placemark = placemarks[0];
-    // currentAddress =
-    //     '${placemark.street} , ${placemark.subLocality}, ${placemark.postalCode}, ${placemark.country}';
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+          currentPositon.latitude, currentPositon.longitude);
+      print('current address ');
+      print(placemarks[0].name);
+      myAdress = placemarks[0];
+      currentAddress =
+          '${myAdress!.street} , ${myAdress!.subLocality}, ${myAdress!.postalCode}, ${myAdress!.country}';
+    } catch (e) {
+      print('exception while getting address...');
+    }
     return currentPositon;
-  }*/
+  }
 
   static void Toast(String msg, Color clr) {
     showToast(
@@ -133,9 +143,9 @@ class Helper {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          LoadingAnimationWidget.inkDrop(
+          LoadingAnimationWidget.bouncingBall(
             color: Theme.of(context).primaryColor,
-            size: 50,
+            size: 70,
           ),
         ],
       ),
@@ -156,11 +166,11 @@ class Helper {
 
   static Widget LoadingWidget(BuildContext context) {
     return SizedBox(
-      child: LoadingAnimationWidget.inkDrop(
+      child: LoadingAnimationWidget.bouncingBall(
         color: Theme.of(context).primaryColor,
         //leftDotColor: const Color(0xFF1A1A3F),
         //rightDotColor: const Color(0xFFEA3799),
-        size: 50,
+        size: 70,
       ),
     );
   }
@@ -169,10 +179,11 @@ class Helper {
     return DateTime.now();
   }
 
-  static void msgDialog(BuildContext context, String msg,Function()? _function_handler) {
+  static void msgDialog(
+      BuildContext context, String msg, Function()? _function_handler) {
     Dialog rejectDialog_with_reason = Dialog(
         shape:
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
         child: Container(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -181,10 +192,10 @@ class Helper {
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: const[
-                   Text(
+                children: const [
+                  Text(
                     "Hi! ",
-                    style:  TextStyle(
+                    style: TextStyle(
                         fontWeight: FontWeight.w100,
                         fontSize: 16,
                         color: Colors.black),
@@ -242,7 +253,7 @@ class Helper {
     return selectedTime;
   }
 
-  static trackAndNotify(String lat,String long){
+  static trackAndNotify(String lat, String long) {
     // LocalNotificationService localNotification = LocalNotificationService();
     // localNotification.initializNotifications();
     // localNotification.sendNotification('Now you are here ', "${lat},${long}");
@@ -311,4 +322,15 @@ class Helper {
   static stopTracking() {
     bg.BackgroundGeolocation.stop();
   }*/
+
+  static String  getCountryCode(String country) {
+    String a='00';
+    CountryCodes.getCountryCodes()['countries'].forEach((value){
+      if(value['name']==country){
+        a=value['code'];
+        return;
+      }
+    });
+    return a;
+  }
 }

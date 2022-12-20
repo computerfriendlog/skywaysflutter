@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:oktoast/oktoast.dart';
 import 'Screens/HomeScreen.dart';
 import 'Screens/LoginScreen.dart';
 import 'Screens/SplashScreen.dart';
@@ -23,19 +23,21 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
+    return OKToast(
 
-        primarySwatch: Colors.blue,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        routes: {
+          SplashScreen.routeName: (ctx) => SplashScreen(),
+          HomeScreen.routeName: (ctx) => HomeScreen(),
+          LoginScreen.routeName: (ctx) => LoginScreen(),
+
+        },
+        home: SplashScreen(),
       ),
-      routes: {
-        SplashScreen.routeName: (ctx) => SplashScreen(),
-        HomeScreen.routeName: (ctx) => HomeScreen(),
-        LoginScreen.routeName: (ctx) => LoginScreen(),
-
-      },
-      home: SplashScreen(),
     );
   }
 }

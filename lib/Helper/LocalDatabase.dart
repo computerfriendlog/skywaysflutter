@@ -7,15 +7,21 @@ class LocalDatabase {
   static const String _userIsLogined = 'userisLogined';
   static const String _userIsAvailableForJob = 'userisAvailable';
 
-  static String GUARD_ID = "guard_id_key";
-  static String NAME = "guardName_key";
+  static String DRIVER_ID = "driver_id_key";
+  static String NAME = "driverName_key";
   static String USER_NAME = "username_key";
   static String USER_PASSWORD = "userpassword_key";
   static String THREAT_LEVEL = "threat_level";
-  static String USER_EMAIL = "guardEmail_key";
-  static String USER_ADDRESS = "guardAddress_key";
-  static String USER_MOBILE = "guard_mobile_key";
-  static String USER_OFFICE = "guard_office_key";
+  static String USER_EMAIL = "driverEmail_key";
+  static String USER_ADDRESS = "driverAddress_key";
+  static String USER_CITY = "driverCity_key";
+  static String USER_COUNTRY_PREFIX = "countryprefix";
+  static String USER_COUNTRY_CODE = "countrycode";
+  static String USER_PAYTIME = "paytime";
+  static String USER_PAYMENT_SOURCE = "payment_source";
+  static String USER_POSTAL_CODE = "driverpostal_key";
+  static String USER_MOBILE = "driver_mobile_key";
+  static String USER_OFFICE = "driver_office_key";
   static String STARTED_JOB = "started_job_key";
   static String SCREEN_OPEN_ON_NOTIFICATION = "screen_on_notify";
   static String FIREBASE_MSG_TOKEN = "push_notification_token";

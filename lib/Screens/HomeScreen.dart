@@ -1,8 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+
 //import 'package:fluttertoast/fluttertoast.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:skywaysflutter/Screens/LoginScreen.dart';
+import 'package:skywaysflutter/Widgets/CustomButton.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/HomeScreen';
@@ -54,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       body: SafeArea(
-        child: Container(
+        child: SizedBox(
             height: _hight,
             width: _width,
             child: ListView(
@@ -62,7 +65,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 Column(
                   //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
+                    CustomButton('login screen', _width * 0.9, () {
+                      Navigator.pushNamed(context, LoginScreen.routeName);
+                    })
                   ],
                 ),
               ],
@@ -71,8 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
-  /*void loadInitailData() async {
+/*void loadInitailData() async {
     name = await LocalDatabase.getString(LocalDatabase.NAME);
     officeName = await LocalDatabase.getString(LocalDatabase.USER_OFFICE);
     gard_id = await LocalDatabase.getString(LocalDatabase.GUARD_ID);

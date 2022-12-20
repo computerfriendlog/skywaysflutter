@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 
 class Constants {
   ///Strings
-  ///static String BASE_URL = 'https://guardapps.tbmslive.com/taxi_app/WebServices/';
-  static String BASE_URL = 'https://guardapps.tbmslive.com/taxi_app/WebServices/guardappv5.php';
+  static String BASE_URL = 'https://tbmslive.com/taxi_app/WebServices/skyways_custv3.php';
   static String noInternetConnection = 'Check your internet connection';
   static String COMPLATED = "completed";
+  static String TYPE_CUSTOMER_LOGIN = "customer_login";
+  static String TYPE_CUSTOMER_REGISTER = "customer_register";
+  static const String OFFICE_NAME = "skyways";
 
 
   ///icons
@@ -25,4 +27,8 @@ class Constants {
   static Color grey = Colors.grey;
   static Color redAccent =
       Colors.redAccent.withOpacity(0.8) ?? Colors.redAccent;
+
+
+  static String img_splash_background='assets/images/bg_splash.png';
+  static String img_logo='assets/images/ic_app_logo.png';
 }
