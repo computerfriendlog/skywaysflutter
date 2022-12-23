@@ -4,11 +4,21 @@ import 'package:flutter/material.dart';
 class Constants {
   ///Strings
   static String BASE_URL = 'https://tbmslive.com/taxi_app/WebServices/skyways_custv3.php';
+  static String MAP_API_KEY = 'AIzaSyD7d2fm_vjbtWAU_l8ZIxLA1JdDWOUy9Ho';
+  static String SUPPORT_PHONE_NUMBER = '+4403333441979';
+  static String SUPPORT_OFFICE_EMAIL = "booking@skywayscars.co.uk";
+  static const String OFFICE_NAME = "skyways";
+
+  /// ---------------------------change above infor for cloning-------------------------------------
   static String noInternetConnection = 'Check your internet connection';
+  static String someThingWentWrong = 'Something went wrong';
   static String COMPLATED = "completed";
   static String TYPE_CUSTOMER_LOGIN = "customer_login";
+  static String TYPE_CUSTOMER_PROFILE_UPDATE = "customer_profile_updated";
+  static String TYPE_CUSTOMER_PASSWORD_UPDATE = "customer_changepassword";
   static String TYPE_CUSTOMER_REGISTER = "customer_register";
-  static const String OFFICE_NAME = "skyways";
+  static String TYPE_GOOGLE_MAP_KEY = "get_google_key";
+
 
 
   ///icons
@@ -31,4 +41,16 @@ class Constants {
 
   static String img_splash_background='assets/images/bg_splash.png';
   static String img_logo='assets/images/ic_app_logo.png';
+  static String img_profile='assets/images/ic_profile.png';
+  static String img_payment='assets/images/ic_payment.png';
+  static String img_logout='assets/images/ic_logout.png';
+  static String img_menu_taxi='assets/images/ic_menu_taxi.png';
+  static String img_menu_support='assets/images/ic_menu_support.png';
+  static String img_ride='assets/images/ic_ride.png';
+  static String img_mail='assets/images/ic_mail.png';
+  static String img_whatsapp_logo='assets/images/ic_whatsapp_logo.png';
+  static String img_call_logo='assets/images/ic_call_logo.png';
+  static String img_add_circled_plus='assets/images/ic_plus_circle_outline_black_24dp.png';
+  static String img_swap='assets/images/ic_swap.png';
+  static String img_map_marker='assets/images/ic_map_marker.png';
 }

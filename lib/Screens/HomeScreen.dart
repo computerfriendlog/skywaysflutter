@@ -1,11 +1,24 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 //import 'package:fluttertoast/fluttertoast.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:skywaysflutter/APIs/RestClient.dart';
+import 'package:skywaysflutter/Helper/Constants.dart';
+import 'package:skywaysflutter/Helper/Helper.dart';
+import 'package:skywaysflutter/Helper/LocalDatabase.dart';
+import 'package:skywaysflutter/Provider/PlaceSuggestionProvider.dart';
 import 'package:skywaysflutter/Screens/LoginScreen.dart';
+import 'package:skywaysflutter/Screens/ProfileScreen.dart';
+import 'package:skywaysflutter/Screens/SupportScreen.dart';
 import 'package:skywaysflutter/Widgets/CustomButton.dart';
+import 'package:skywaysflutter/Widgets/PlaceSearchTextField.dart';
+import 'package:skywaysflutter/Widgets/HelperWidgets.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/HomeScreen';
@@ -23,10 +36,13 @@ String date = ' . . ';
 String deviceType = '';
 String name = '';
 String officeName = '';
-String gard_id = '';
+String driver_id = '';
 String password = '';
-String office_phone = '';
+String driver_phone = '';
+String driver_mail = '';
 String threat_level = '';
+String google_map_key_globle = '';
+bool isLogined = false;
 
 class _HomeScreenState extends State<HomeScreen> {
   //bool availableForJob = true;
@@ -36,227 +52,398 @@ class _HomeScreenState extends State<HomeScreen> {
   int total__new_jobs = 0;
   int total_no_of_hours = 0;
   Color? greyButtons = Colors.grey[200];
+  double menu_icon_size = 23;
+  final restClient = RestClient();
+  TextEditingController _controller_pick_up = TextEditingController();
+  TextEditingController _controller_drop_off = TextEditingController();
+  LatLng? latLng_pick;
+  LatLng? latLng_drop;
 
-  //LocationService locationService=LocationService();
+  bool selectingPickup = true;
+  static CameraPosition? _cameraPosition = CameraPosition(
+    target: LatLng(37.121212, 76.65151),
+    zoom: 12.4746,
+  );
+  GoogleMapController? _controller_map;
+  Set<Marker> markers = {};
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    //loadInitailData();
-    //checkHaveStartedJob(); //then start tracking init
-    //round if from notification
-    //rountNext();
+    loadInitailData();
+    getLocation();
+    _controller_pick_up.addListener(() {
+      selectingPickup = true;
+      if (_controller_pick_up.text.toString().length < 7) {
+        searchPlace(_controller_pick_up.text.toString());
+      } else {
+        searchPlace('');
+      }
+    });
+    _controller_drop_off.addListener(() {
+      selectingPickup = false;
+      if (_controller_drop_off.text.toString().length < 7) {
+        searchPlace(_controller_drop_off.text.toString());
+      } else {
+        searchPlace('');
+      }
+    });
   }
 
   @override
-  Widget build(BuildContext context) {
+  build(BuildContext context) {
     //print('staus value is,,,,,,,,,,,,, ${Provider.of<GuardStatus>(context).getStatus()}');
     MediaQueryData mediaQueryData = MediaQuery.of(context);
+
     var _hight = mediaQueryData.size.height;
     var _width = mediaQueryData.size.width;
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      appBar: AppBar(
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+        elevation: 0,
+        title: Text(
+          'SkyWaysCars',
+          style: HelperWidgets.myAppbarStyle(),
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            SizedBox(
+              //width: _width * 0.4,
+              height: _hight * 0.2,
+              child: DrawerHeader(
+                padding: const EdgeInsets.all(30),
+                child: Image.asset(fit: BoxFit.fill, Constants.img_logo),
+              ),
+            ),
+            ListTile(
+              leading: Image.asset(
+                  width: menu_icon_size,
+                  height: menu_icon_size,
+                  fit: BoxFit.fill,
+                  Constants.img_menu_taxi),
+              title: Text(
+                'Book Now',
+                style: HelperWidgets.text_menu(),
+              ),
+              iconColor: Colors.grey,
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            isLogined
+                ? ListTile(
+                    leading: Image.asset(
+                        width: menu_icon_size,
+                        height: menu_icon_size,
+                        fit: BoxFit.fill,
+                        Constants.img_profile),
+                    title: Text('Profile', style: HelperWidgets.text_menu()),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, ProfileScreen.routeName);
+                    },
+                  )
+                : Container(),
+            isLogined
+                ? ListTile(
+                    leading: Image.asset(
+                        width: menu_icon_size,
+                        height: menu_icon_size,
+                        fit: BoxFit.fill,
+                        Constants.img_payment),
+                    title: Text('Payment', style: HelperWidgets.text_menu()),
+                    onTap: () {
+                      // Update the state of the app.
+                      // ...
+                    },
+                  )
+                : Container(),
+            isLogined
+                ? ListTile(
+                    leading: Image.asset(
+                        width: menu_icon_size,
+                        height: menu_icon_size,
+                        fit: BoxFit.fill,
+                        Constants.img_ride),
+                    title: Text('My Rides', style: HelperWidgets.text_menu()),
+                    onTap: () {
+                      // Update the state of the app.
+                      // ...
+                    },
+                  )
+                : Container(),
+            ListTile(
+              leading: Image.asset(
+                  width: menu_icon_size,
+                  height: menu_icon_size,
+                  fit: BoxFit.fill,
+                  Constants.img_menu_support),
+              title: Text('Support', style: HelperWidgets.text_menu()),
+              onTap: () {
+                Navigator.pushNamed(context, SupportScreen.routeName);
+              },
+            ),
+            isLogined
+                ? ListTile(
+                    leading: Image.asset(
+                        width: menu_icon_size,
+                        height: menu_icon_size,
+                        fit: BoxFit.fill,
+                        Constants.img_logout),
+                    title: Text('Logout', style: HelperWidgets.text_menu()),
+                    onTap: () async {
+                      bool result = await showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              //title: Text('Confirmation'),
+                              content: const Text(
+                                  'Do you want to logout from this application?'),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context, rootNavigator: true).pop(
+                                        false); // dismisses only the dialog and returns false
+                                  },
+                                  child: const Text('No'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context, rootNavigator: true).pop(
+                                        true); // dismisses only the dialog and returns true
+                                  },
+                                  child: const Text('Yes'),
+                                ),
+                              ],
+                            );
+                          });
+                      if (result) {
+                        print('logout');
+                        if (Helper.logOut()) {
+                          Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              LoginScreen.routeName,
+                              (Route<dynamic> route) => false);
+                          //Navigator.of(context).pushNamed(LoginScreen.routeName);
+                        } else {
+                          Helper.Toast(
+                              'Logout failed, try again', Constants.toast_red);
+                        }
+                      } else {
+                        print('don\'t logout');
+                      }
+                    },
+                  )
+                : Container(),
+          ],
+        ),
+      ),
       body: SafeArea(
         child: SizedBox(
-            height: _hight,
-            width: _width,
-            child: ListView(
-              children: [
-                Column(
-                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomButton('login screen', _width * 0.9, () {
-                      Navigator.pushNamed(context, LoginScreen.routeName);
-                    })
-                  ],
-                ),
-              ],
-            )),
+          height: _hight,
+          width: _width,
+          child: Stack(
+            children: [
+              GoogleMap(
+                mapType: MapType.normal,
+                markers: markers,
+                initialCameraPosition: _cameraPosition!,
+                onMapCreated: (GoogleMapController controller) {
+                  _controller_map = controller;
+                  print('map createdf');
+                },
+              ),
+              ListView(
+                children: [
+                  Column(
+                    //mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      PlaceSearchTextField(
+                          _width * 0.95, "Pick up", _controller_pick_up, () {
+                        _controller_pick_up.clear();
+                      }),
+                      Container(
+                        width: _width * 0.95,
+                        margin: const EdgeInsets.all(2),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Image.asset(
+                                width: menu_icon_size,
+                                height: menu_icon_size,
+                                fit: BoxFit.fill,
+                                Constants.img_add_circled_plus),
+                            Image.asset(
+                                width: menu_icon_size,
+                                height: menu_icon_size,
+                                fit: BoxFit.fill,
+                                Constants.img_swap),
+                          ],
+                        ),
+                      ),
+                      PlaceSearchTextField(
+                          _width * 0.95, "Drop Off", _controller_drop_off, () {
+                        _controller_drop_off.clear();
+                      }),
+                      Provider.of<PlaceSuggestProvider>(context)
+                              .getPlaces()
+                              .isNotEmpty
+                          ? SizedBox(
+                              width: _width * 0.95,
+                              child: ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                reverse: true,
+                                itemCount:
+                                    Provider.of<PlaceSuggestProvider>(context)
+                                        .getPlaces()
+                                        .length,
+                                physics: const ScrollPhysics(),
+                                itemBuilder: (ctx, index) {
+                                  return Container(
+                                    padding: const EdgeInsets.all(1),
+                                    child: Card(
+                                      child: InkWell(
+                                        onTap: () async {
+                                          if (selectingPickup) {
+                                            _controller_pick_up.text = Provider
+                                                    .of<PlaceSuggestProvider>(
+                                                        context,
+                                                        listen: false)
+                                                .getPlaces()[index];
+                                          } else {
+                                            _controller_drop_off.text = Provider
+                                                    .of<PlaceSuggestProvider>(
+                                                        context,
+                                                        listen: false)
+                                                .getPlaces()[index];
+                                          }
+                                          print('clicked....$selectingPickup');
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(5),
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                Constants.ic_location,
+                                                size: 20,
+                                                color: Colors.grey,
+                                              ),
+                                              Flexible(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(2.0),
+                                                  child: Text(
+                                                    Provider.of<PlaceSuggestProvider>(
+                                                            context)
+                                                        .getPlaces()[index],
+                                                    style: HelperWidgets
+                                                        .text_heading_16_300(),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            )
+                          : Container(),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-/*void loadInitailData() async {
+  void loadInitailData() async {
     name = await LocalDatabase.getString(LocalDatabase.NAME);
-    officeName = await LocalDatabase.getString(LocalDatabase.USER_OFFICE);
-    gard_id = await LocalDatabase.getString(LocalDatabase.GUARD_ID);
+    driver_id = await LocalDatabase.getString(LocalDatabase.DRIVER_ID);
     password = await LocalDatabase.getString(LocalDatabase.USER_PASSWORD);
-    office_phone = await LocalDatabase.getString(LocalDatabase.USER_MOBILE);
-    threat_level = await LocalDatabase.getString(LocalDatabase.THREAT_LEVEL);
+    driver_phone = await LocalDatabase.getString(LocalDatabase.USER_MOBILE);
+    driver_mail = await LocalDatabase.getString(LocalDatabase.USER_EMAIL);
+    isLogined = await LocalDatabase.isUserLogined();
+    //threat_level = await LocalDatabase.getString(LocalDatabase.THREAT_LEVEL);
 
     if (Platform.isAndroid) {
       deviceType = 'Android';
     } else if (Platform.isIOS) {
       deviceType = 'IOS';
     }
-    print(
-        'after login detail is here  $officeName  \n $gard_id      \n   $password   ');
-    Provider.of<GuardStatus>(context, listen: false)
-        .changeStatus(await LocalDatabase.isAvailable() ?? false);
-    DateTime now = DateTime.now();
-    //print('day is ${DateFormat('EEEE').format(now)}');
-
-    month = DateFormat.MMMM().format(now);
-    date = DateFormat('dd').format(now);
-    day = DateFormat('EEEE').format(now);
-    getDashboardData(); //it has setState
-    await Helper.determineCurrentPosition();
+    setState(() {});
+    //await Helper.determineCurrentPosition();
+    //setState(() {});
   }
 
-  void getDashboardData() async {
-    try {
-      final parameters = {
-        'type': Constants.DASHBOARD_TYPE,
-        'office_name': officeName,
-        'guard_id': gard_id,
-        'password': password,
-      };
-
-      final respoce = await restClient.get(Constants.BASE_URL + "",
-          headers: {}, body: parameters);
-      print(
-          'dashboard responce is hereeee.         $respoce   mmmmmmmm  ${respoce.data['DATA'][0]}');
-
-      if (respoce.data['RESULT'] == 'OK' && respoce.data['msg'] == 'success') {
-        total_jobs = respoce.data['DATA'][0]['total_jobs'];
-        total_accepted_jobs = respoce.data['DATA'][0]['total_accepted_jobs'];
-        total__new_jobs = respoce.data['DATA'][0]['total_jobs_new'];
-        total_no_of_hours = respoce.data['DATA'][0]['total_no_of_hours'];
-      } else {
-        print("api not working... " + respoce.data['msg']);
-      }
-      setState(() {});
-    } catch (e) {
-      setState(() {});
-    }
-  }
-
-  void sendviaSms() async {
-    await Helper.determineCurrentPosition();
+  void searchPlace(String query) async {
     final parameters = {
-      'type': Constants.RETURN_LINK,
-      'office_name': officeName,
-      'latitude': Helper.currentPositon.latitude,
-      'longitude': Helper.currentPositon.longitude,
+      'input': query,
+      //'key': 'AIzaSyCuVz0BvNOdc0-Y4X9U3bBdEOx6bq6yvHI',//thmovers  //Constants.MAP_API_KEY,
+      'key': Constants.MAP_API_KEY,
     };
-    final respoce = await restClient.get(Constants.BASE_URL + "",
-        headers: {}, body: parameters);
+    final respose = await restClient.get(
+        "https://maps.googleapis.com/maps/api/place/autocomplete/json?",
+        headers: {},
+        body: parameters);
 
-    print('link retrun is here...  $respoce');
-    if (respoce.data['msg'] == 'success') {
-      Helper.textviaSim(office_phone, respoce.data['DATA']['link']);
-    }
-  }
-
-  void sendviaSystem() async {
-    Helper.showLoading(context);
-    await Helper.determineCurrentPosition();
-    try {
-      final parameters = {
-        'type': Constants.UPDATE_DRIVER_DOC,
-        'office_name': officeName,
-        'guard_id': gard_id,
-        'latitude': Helper.currentPositon.latitude.toString(),
-        'longitude': Helper.currentPositon.longitude.toString(),
-      };
-      final respoce = await restClient.get(Constants.BASE_URL + "",
-          headers: {}, body: parameters);
-
-      print('location update via system, respoce is here...  $respoce');
-      if (respoce.data['msg'] == 'Current Location Updated') {
-        Helper.Toast('Location updated', Constants.toast_grey);
-      } else {
-        Helper.Toast(
-            'Can\'t update Location, please try again', Constants.toast_red);
-      }
-      Navigator.pop(context);
-    } catch (e) {
-      Navigator.pop(context);
-      Helper.Toast(Constants.somethingwentwrong, Constants.toast_red);
-    }
-  }
-
-  void loadCheckCallsOfStartedJob(
-      String job_id,
-      ) async {
-    print('etting check points');
-    await Helper.determineCurrentPosition();
-
-    final parameters = {
-      'type': Constants.CHECK_POINTS,
-      'office_name': officeName,
-      'guard_id': gard_id,
-      'job_id': job_id,
-      'latitude': Helper.currentPositon.latitude,
-      'longitude': Helper.currentPositon.longitude,
-    };
-    final respoce = await restClient.get(Constants.BASE_URL + "",
-        headers: {}, body: parameters);
-
-    print(
-        'response is here of check calls on home page is here  ${respoce.data} ');
-    if (respoce.data['RESULT'] == 'OK' && respoce.data['status'] == 1) {
-      respoce.data['DATA'].forEach((value) {
-        /*chkPoint_list.add(CheckPoint(
-            barcode: respoce.data['DATA'][i]['barcode'],
-            check_point_id: respoce.data['DATA'][i]['check_point_id'],
-            guard_id: respoce.data['DATA'][i]['guard_id'],
-            job_id: respoce.data['DATA'][i]['job_id'],
-            name: respoce.data['DATA'][i]['name'],
-            status: respoce.data['DATA'][i]['status'],
-            time: respoce.data['DATA'][i]['time']));*/
-
-        print('check point 1 is  ${value['status']}');
-        if (value['status'] == '0') {
-          //its upcoming check point
-          print('check point alarm time is  ${value['time']}');
-          DateTime tempTimeOfCheckPoint =
-          DateFormat("dd-MM-yyyy hh:m:ss").parse(value['time']);
-
-          print(
-              'time ${tempTimeOfCheckPoint}, difference of  ${value['check_point_id']} is...   ${tempTimeOfCheckPoint.difference(Helper.getCurrentTime())}');
-          if (!tempTimeOfCheckPoint
-              .difference(Helper.getCurrentTime())
-              .isNegative) {
-            //check point is coming...
-            localNotificationService.scheduleNotification(
-                'Dear user Tap here ',
-                'To check your job point',
-                tempTimeOfCheckPoint.subtract(Duration(minutes: 15)),
-                int.parse(value['check_point_id']));
-          }
-        }
+    print('place suggestion are here....${respose.data['predictions']}');
+    if (respose.data != null) {
+      Provider.of<PlaceSuggestProvider>(context, listen: false).removeAll();
+      respose.data['predictions'].forEach((prediction) {
+        Provider.of<PlaceSuggestProvider>(context, listen: false)
+            .add(prediction['description']);
+        print('place suggestion are here....${prediction['description']}');
       });
     }
-    //print('check point 1 is  }');
   }
 
-  void checkHaveStartedJob() async {
-    //57440 start this job recently
-    //await LocalDatabase.saveString(LocalDatabase.STARTED_JOB, '57440');
-    String id = await LocalDatabase.getString(LocalDatabase.STARTED_JOB);
-
-    print('id is  $id ');
-    if (id != 'null') {
-      //have start job
-      loadCheckCallsOfStartedJob(id);
-      Helper.checkJobAndTrack();
+  void getLocation() async {
+    await Helper.determineCurrentPosition();
+    print(
+        'my loc is ${Helper.currentPositon.latitude}   ${Helper.currentPositon.latitude}');
+    //_cameraPosition!.target.latitude!=Helper.currentPositon.latitude;
+    //_cameraPosition!.target.longitude!=Helper.currentPositon.longitude;
+    _cameraPosition = CameraPosition(
+      target: LatLng(
+          Helper.currentPositon.latitude, Helper.currentPositon.longitude),
+      zoom: 15.4746,
+    );
+    //final GoogleMapController controller = await _controller_map.future;
+    BitmapDescriptor market_icon = await BitmapDescriptor.fromAssetImage(
+        const ImageConfiguration(size: Size.square(20)),
+        Constants.img_map_marker);
+    _controller_map!
+        .animateCamera(CameraUpdate.newCameraPosition(_cameraPosition!));
+    markers.add(Marker(
+      markerId: MarkerId('Current Location'),
+      icon: market_icon,
+      position: LatLng(
+          Helper.currentPositon.latitude, Helper.currentPositon.longitude),
+    ));
+    latLng_pick =
+        LatLng(Helper.currentPositon.latitude, Helper.currentPositon.longitude);
+    if (latLng_pick != null) {
+      String pik = await Helper.getAddressFromLatLong(latLng_pick!);
+      if (pik != 'null') {
+        _controller_pick_up.text = pik;
+      }
+      setState(() {});
     }
   }
-
-  void rountNext() async{
-    String nextScreen = await LocalDatabase.getString(LocalDatabase.SCREEN_OPEN_ON_NOTIFICATION);
-    print('nextscreen:  $nextScreen}');
-    if (nextScreen == Constants.NEXT_SCREEN_CURRENTJOBS) {
-      Navigator.of(context).pushNamed(CurrentJobs.routeName);
-    } else if (nextScreen == Constants.NEXT_SCREEN_MESSAGE) {
-      Navigator.of(context).pushNamed(MessageScreen.routeName);
-    } else {
-      //remain here...
-    }
-    LocalDatabase.saveString(LocalDatabase.SCREEN_OPEN_ON_NOTIFICATION, Constants.NEXT_SCREEN_HOME);
-  }
-
-   */
-
 }
+
+// TODO  for getting fare estimation scree in real skyway SelectVehicleActivity
+///------==========================-----==========================

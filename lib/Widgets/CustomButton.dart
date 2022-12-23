@@ -17,7 +17,7 @@ class CustomButton extends StatelessWidget {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: background ?? Theme.of(context).primaryColor,
-          textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         ),
         onPressed: _function_handler,
         child: Padding(

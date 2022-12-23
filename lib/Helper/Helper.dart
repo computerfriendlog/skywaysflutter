@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-
-//import 'package:url_launcher/url_launcher.dart';
+import 'package:skywaysflutter/Helper/Constants.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 //import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 //import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -10,7 +12,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:skywaysflutter/Helper/LocalDatabase.dart';
 import '../Helper/CountryCodes.dart';
+import 'package:geocoding/geocoding.dart';
 
 //import '../APIs/APICalls.dart';
 //import '../Services/LocalNotificationService.dart';
@@ -43,13 +47,19 @@ class Helper {
     print('logout is going heree.....');
     bool logout = false;
     try {
-      //LocalDatabase.saveString(LocalDatabase.GUARD_ID, '');
-      //LocalDatabase.saveString(LocalDatabase.NAME, '');
-      //LocalDatabase.saveString(LocalDatabase.USER_NAME, '');
-      //LocalDatabase.saveString(LocalDatabase.USER_EMAIL, '');
-      //LocalDatabase.saveString(LocalDatabase.USER_ADDRESS, '');
-      //LocalDatabase.saveString(LocalDatabase.USER_MOBILE, '');
-      //LocalDatabase.setLogined(false);
+      LocalDatabase.saveString(LocalDatabase.USER_NAME, 'null');
+      LocalDatabase.saveString(LocalDatabase.DRIVER_ID, 'null'); //title
+      LocalDatabase.saveString(LocalDatabase.NAME, 'null');
+      LocalDatabase.saveString(LocalDatabase.USER_MOBILE, 'null');
+      LocalDatabase.saveString(LocalDatabase.USER_EMAIL, 'null');
+      LocalDatabase.saveString(LocalDatabase.USER_ADDRESS, 'null');
+      LocalDatabase.saveString(LocalDatabase.USER_CITY, 'null');
+      LocalDatabase.saveString(LocalDatabase.USER_POSTAL_CODE, 'null');
+      LocalDatabase.saveString(LocalDatabase.USER_COUNTRY_PREFIX, 'null');
+      LocalDatabase.saveString(LocalDatabase.USER_COUNTRY_CODE, 'null');
+      LocalDatabase.saveString(LocalDatabase.USER_PAYMENT_SOURCE, 'null');
+      LocalDatabase.saveString(LocalDatabase.USER_PAYTIME, 'null');
+      LocalDatabase.setLogined(false);
       logout = true;
     } catch (e) {
       logout = false;
@@ -57,7 +67,7 @@ class Helper {
     return logout;
   }
 
-  /* static Future<void> makePhoneCall(String phoneNumber) async {
+  static Future<void> makePhoneCall(String phoneNumber) async {
     final Uri launchUri = Uri(
       scheme: 'tel',
       path: phoneNumber,
@@ -74,7 +84,37 @@ class Helper {
       var uri = 'sms:$phone&body=$msg%20there';
       await launch(uri);
     }
-  }*/
+  }
+
+  static openEmailApp(String to) async {
+    try {
+      final url = 'mailto:$to';
+      if (await canLaunch(url)) {
+        await launch(url);
+      } else {
+        Helper.Toast("App Email not found!", Constants.toast_grey);
+      }
+    } catch (e) {
+      Helper.Toast("App Email not found!", Constants.toast_grey);
+    }
+  }
+
+  static openWhatsapp() async {
+    var androidUrl =
+        "whatsapp://send?phone=${Constants.SUPPORT_PHONE_NUMBER}&text=Hi,";
+    var iosUrl =
+        "https://wa.me/${Constants.SUPPORT_PHONE_NUMBER}?text=${Uri.parse('Hi,')}";
+
+    try {
+      if (Platform.isIOS) {
+        await launchUrl(Uri.parse(iosUrl));
+      } else {
+        await launchUrl(Uri.parse(androidUrl));
+      }
+    } on Exception {
+      Helper.Toast('WhatsApp is not installed.', Constants.toast_grey);
+    }
+  }
 
   static Future<Position> determineCurrentPosition() async {
     bool serviceEnabled;
@@ -122,6 +162,20 @@ class Helper {
       print('exception while getting address...');
     }
     return currentPositon;
+  }
+
+  static Future<String> getAddressFromLatLong(LatLng latLng) async {
+    try {
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
+      print(' address got successfully');
+      print(placemarks[0].subLocality);
+      myAdress = placemarks[0];
+      return '${myAdress!.street} , ${myAdress!.subLocality}, ${myAdress!.postalCode}, ${myAdress!.country}';
+    } catch (e) {
+      print('exception while getting address...');
+      return 'null';
+    }
   }
 
   static void Toast(String msg, Color clr) {
@@ -323,14 +377,23 @@ class Helper {
     bg.BackgroundGeolocation.stop();
   }*/
 
-  static String  getCountryCode(String country) {
-    String a='00';
-    CountryCodes.getCountryCodes()['countries'].forEach((value){
-      if(value['name']==country){
-        a=value['code'];
+  static String getCountryCode(String country) {
+    String a = '00';
+    CountryCodes.getCountryCodes()['countries'].forEach((value) {
+      if (value['name'] == country) {
+        a = value['code'];
         return;
       }
     });
     return a;
+  }
+
+  static Future<LatLng?> getLatLongFromAddress(String address) async {
+    try {
+      List<Location> locations = await locationFromAddress(address);
+      return LatLng(locations.first.latitude, locations.first.longitude);
+    } catch (e) {
+      return null;
+    }
   }
 }

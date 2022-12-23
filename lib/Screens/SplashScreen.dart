@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:skywaysflutter/APIs/RestClient.dart';
 import 'package:skywaysflutter/Helper/Constants.dart';
 import '../Helper/Helper.dart';
 import '../Helper/LocalDatabase.dart';
@@ -10,6 +12,7 @@ import 'LoginScreen.dart';
 
 class SplashScreen extends StatefulWidget {
   static const routeName = '/SplashScreen';
+
   const SplashScreen({Key? key}) : super(key: key);
 
   @override
@@ -23,14 +26,14 @@ class _SplashScreenState extends State<SplashScreen>
 
   bool showBtn = false;
   String label = 'Next';
-
-
+  final restClient = RestClient();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     checkPermissionStatus();
+    getMapKey();
   }
 
   @override
@@ -49,14 +52,14 @@ class _SplashScreenState extends State<SplashScreen>
                 width: _width,
                 height: _hight,
                 fit: BoxFit.fill,
-                Constants.img_splash_background ),
-              Center(
-                child: Image.asset(
-                    width: _width*0.85,
-                    height: _hight*0.15,
-                    fit: BoxFit.fill,
-                    Constants.img_logo),
-              ),
+                Constants.img_splash_background),
+            Center(
+              child: Image.asset(
+                  width: _width * 0.85,
+                  height: _hight * 0.15,
+                  fit: BoxFit.fill,
+                  Constants.img_logo),
+            ),
             showBtn
                 ? Column(
                     mainAxisSize: MainAxisSize.max,
@@ -89,11 +92,12 @@ class _SplashScreenState extends State<SplashScreen>
           checkPermissionStatus(); //recursive
         } else {
           showBtn = true;
-          setState((){});
+          setState(() {});
           openAppSettings();
         }
       });
-    } /*else if (await Permission.activityRecognition.status !=
+    }
+    /*else if (await Permission.activityRecognition.status !=
         PermissionStatus.granted) {
       if (Platform.isAndroid) {
         Helper.msgDialog(context,
@@ -134,8 +138,8 @@ class _SplashScreenState extends State<SplashScreen>
           openAppSettings();
         }
       });
-    } */else if (await Permission.notification.status !=
-        PermissionStatus.granted) {
+    } */
+    else if (await Permission.notification.status != PermissionStatus.granted) {
       Helper.msgDialog(
           context, 'Please allow notifications to make it more reliable',
           () async {
@@ -144,7 +148,7 @@ class _SplashScreenState extends State<SplashScreen>
           checkPermissionStatus(); //recursive
         } else {
           showBtn = true;
-          setState((){});
+          setState(() {});
           openAppSettings();
         }
       });
@@ -153,9 +157,13 @@ class _SplashScreenState extends State<SplashScreen>
       animationCall();
     }
   }
+
   void animationCall() {
     Helper.showLoading(context);
-    controller = AnimationController(duration: const Duration(seconds: 2), vsync: this,);
+    controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
     animation = CurvedAnimation(parent: controller!, curve: Curves.decelerate);
     controller?.forward();
     animation?.addStatusListener((status) async {
@@ -176,5 +184,30 @@ class _SplashScreenState extends State<SplashScreen>
     controller?.addListener(() {
       setState(() {});
     });
+  }
+
+  void getMapKey() async {
+    final parameters = {
+      'type': Constants.TYPE_GOOGLE_MAP_KEY,
+      'office_name': Constants.OFFICE_NAME
+    };
+    try {
+      final respose = await restClient.get(Constants.BASE_URL + "",
+          headers: {}, body: parameters);
+
+      //Navigator.of(context, rootNavigator: true).pop(false);
+      final ress = jsonDecode(respose.data);
+      print('gogle map key, response is..... ${ress}');
+      if (ress['RESULT'] == "Ok") {
+        LocalDatabase.saveString(
+            LocalDatabase.GOOGLE_MAP_KEY, ress['DATA']['link']);
+        google_map_key_globle = ress['DATA']['link'];
+      } else {
+        google_map_key_globle =
+            await LocalDatabase.getString(LocalDatabase.GOOGLE_MAP_KEY);
+      }
+    } catch (e) {
+      google_map_key_globle = await LocalDatabase.getString(LocalDatabase.GOOGLE_MAP_KEY);
+    }
   }
 }

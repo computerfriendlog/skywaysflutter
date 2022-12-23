@@ -90,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               _width * 0.95,
                               'jon.example@deo.com',
                               'Email',
-                              TextInputType.name,
+                              TextInputType.emailAddress,
                               _controller_UserName),
                           !isLoginSelected
                               ? CustomTextField(
@@ -325,13 +325,11 @@ class _LoginScreenState extends State<LoginScreen> {
     print('login, response is..... ${res}');
 
     if (res['RESULT'] == 'OK') {
-      LocalDatabase.saveString(
-          LocalDatabase.USER_NAME, res['DATA']['username']);
+      LocalDatabase.saveString(LocalDatabase.USER_NAME, res['DATA']['username']);
       LocalDatabase.saveString(
           LocalDatabase.DRIVER_ID, res['DATA']['customer_id']); //title
       LocalDatabase.saveString(LocalDatabase.NAME, res['DATA']['Account_name']);
-      LocalDatabase.saveString(
-          LocalDatabase.USER_MOBILE, res['DATA']['mobile']);
+      LocalDatabase.saveString(LocalDatabase.USER_MOBILE, res['DATA']['mobile']);
       LocalDatabase.saveString(LocalDatabase.USER_EMAIL, res['DATA']['email']);
       LocalDatabase.saveString(
           LocalDatabase.USER_ADDRESS, res['DATA']['address']);
@@ -383,6 +381,8 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       //print(e.toString());
     }
+
+    //print('data...  $pos');
     final parameters = {
       'type': Constants.TYPE_CUSTOMER_REGISTER,
       'mobile_no': mbl,
@@ -399,8 +399,23 @@ class _LoginScreenState extends State<LoginScreen> {
         headers: {}, body: parameters);
 
     //Navigator.of(context, rootNavigator: true).pop(false);
-    final res = jsonDecode(respose.data);
-    print('register, response is..... ${res}');
+    final ress = jsonDecode(respose.data);
+    print('register, response is..... ${ress}');
     //Helper.Toast(msg, clr)
+    if (ress['RESULT'] == "OK") {
+      Navigator.pop(context);
+      loginUser(email, pswd);
+    } else {
+      Navigator.pop(context);//animation
+      Helper.msgDialog(context, ress['DATA']['msg'], () {
+        Navigator.pop(context);//this dialog
+
+      });
+
+    }
+  }
+
+  void goNext(res) {
+
   }
 }

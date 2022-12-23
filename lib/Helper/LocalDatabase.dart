@@ -21,10 +21,10 @@ class LocalDatabase {
   static String USER_PAYMENT_SOURCE = "payment_source";
   static String USER_POSTAL_CODE = "driverpostal_key";
   static String USER_MOBILE = "driver_mobile_key";
-  static String USER_OFFICE = "driver_office_key";
   static String STARTED_JOB = "started_job_key";
   static String SCREEN_OPEN_ON_NOTIFICATION = "screen_on_notify";
   static String FIREBASE_MSG_TOKEN = "push_notification_token";
+  static String GOOGLE_MAP_KEY = "google_map_key";
 
   static Future setLogined(bool logined) async {
     try {
