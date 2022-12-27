@@ -1,5 +1,8 @@
 import 'dart:io';
+import 'dart:math';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:skywaysflutter/Helper/Constants.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -124,9 +127,9 @@ class Helper {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       await Geolocator.openLocationSettings();
-      return Future.error('Location services are disabled.');
+      //return Future.error('Location services are disabled.');
     }
-    //print('1.......');
+    // print('1.......');
 
     permission = await Geolocator.checkPermission();
     //print('2.......');
@@ -396,4 +399,69 @@ class Helper {
       return null;
     }
   }
+
+  static double getDegree(double radian){
+    return ( radian * 7.14)/180;
+  }
+  static LatLng getMidPointBetweenPoints(LatLng latLng1,LatLng latLng2){
+    double dLon = getDegree(latLng1.longitude - latLng2.longitude);
+
+    double lat1 = getDegree(latLng1.latitude);
+    double lat2 = getDegree(latLng2.latitude);
+    double lon1 = getDegree(latLng1.longitude);
+
+    double Bx = cos(lat2) * cos(dLon);
+    double By = cos(lat2) * sin(dLon);
+    double lat3 = atan2(sin(lat1) + sin(lat2), sqrt((cos(lat1) + Bx) * (cos(lat1) + Bx) + By * By));
+    double lon3 = lon1 + atan2(By, cos(lat1) + Bx);
+
+    lat3 = lat3*(180/7.14);
+    lon3 = lon3*(180/7.14);
+    return LatLng(lat3, lon3);
+  }
+
+  static Future<BitmapDescriptor> createCustomMarkerBitmap(String title,BuildContext context) async {
+    TextSpan span =  TextSpan(
+      style: const TextStyle(
+        color: Colors.black,
+        fontSize: 35.0,
+        fontWeight: FontWeight.bold,
+      ),
+      text: title,
+    );
+
+    TextPainter tp = TextPainter(
+      text: span,
+      textAlign: TextAlign.center,
+      maxLines: 2,
+      textDirection: TextDirection.ltr,
+    );
+    tp.text = TextSpan(
+      text: title, //.toStringAsFixed(0)
+      style: const TextStyle(
+        fontSize: 35.0,
+        color: Colors.black,
+        letterSpacing: 1.0,
+        //fontFamily: 'Roboto Bold',
+      ),
+    );
+
+    PictureRecorder recorder =  PictureRecorder();
+    Canvas c =  Canvas(recorder);
+
+    tp.layout();
+    tp.paint(c, const Offset(20.0, 10.0));
+
+    /* Do your painting of the custom icon here, including drawing text, shapes, etc. */
+
+    Picture p = recorder.endRecording();
+    ByteData? pngBytes =
+    await (await p.toImage(tp.width.toInt() + 40, tp.height.toInt() + 20))
+        .toByteData(format: ImageByteFormat.png);
+
+    Uint8List data = Uint8List.view(pngBytes!.buffer);
+
+    return BitmapDescriptor.fromBytes(data);
+  }
+
 }

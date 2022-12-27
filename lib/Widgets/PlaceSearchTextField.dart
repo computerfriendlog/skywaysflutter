@@ -62,7 +62,9 @@ class PlaceSearchTextField extends StatelessWidget {
               InkWell(
                 onTap: _function_handler,
                 child: Container(
-                    padding: const EdgeInsets.all(10),
+                    color: Colors.white,
+                    padding: const EdgeInsets.all(7),
+                    margin: const EdgeInsets.all(3),
                     child: Icon(Constants.ic_cross)),
               ),
             ],

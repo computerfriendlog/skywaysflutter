@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:skywaysflutter/Provider/PlaceSuggestionProvider.dart';
 import 'package:skywaysflutter/Screens/ProfileScreen.dart';
+import 'package:skywaysflutter/Screens/RideProcess/BookingConfirmScreen.dart';
+import 'package:skywaysflutter/Screens/SelectVehicleScreen.dart';
 import 'package:skywaysflutter/Screens/SupportScreen.dart';
 import 'Screens/HomeScreen.dart';
 import 'Screens/LoginScreen.dart';
@@ -15,6 +17,9 @@ import 'Services/LocalNotificationService.dart';
 ///  to do
 /// forgot password
 ///
+///
+// TODO: Documentation
+//Change parameters{Google api key, office name, BASE_URL, } from lib->Helper->Constants.dart
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   //localNotificationService.initializNotifications();
@@ -48,7 +53,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.blue,
             secondaryHeaderColor: Colors.blue,
-              accentColor: Colors.blue
+              accentColor: Colors.blue,
           ),
           routes: {
             SplashScreen.routeName: (ctx) => SplashScreen(),
@@ -56,6 +61,8 @@ class MyApp extends StatelessWidget {
             LoginScreen.routeName: (ctx) => LoginScreen(),
             SupportScreen.routeName: (ctx) => SupportScreen(),
             ProfileScreen.routeName: (ctx) => ProfileScreen(),
+            SelectVehicleScreen.routeName: (ctx) => SelectVehicleScreen(),
+            BookingConfirmScreen.routeName: (ctx) => BookingConfirmScreen(),
           },
           home: SplashScreen(),
         ),

@@ -8,16 +8,20 @@ class Constants {
   static String SUPPORT_PHONE_NUMBER = '+4403333441979';
   static String SUPPORT_OFFICE_EMAIL = "booking@skywayscars.co.uk";
   static const String OFFICE_NAME = "skyways";
+  static const String APP_NAME = "SkyWaysCars";
 
   /// ---------------------------change above infor for cloning-------------------------------------
   static String noInternetConnection = 'Check your internet connection';
   static String someThingWentWrong = 'Something went wrong';
   static String COMPLATED = "completed";
   static String TYPE_CUSTOMER_LOGIN = "customer_login";
+  static String TYPE_ALL_VEHICLE_PRICES = "all_vehicle_prices_miles";
   static String TYPE_CUSTOMER_PROFILE_UPDATE = "customer_profile_updated";
   static String TYPE_CUSTOMER_PASSWORD_UPDATE = "customer_changepassword";
   static String TYPE_CUSTOMER_REGISTER = "customer_register";
   static String TYPE_GOOGLE_MAP_KEY = "get_google_key";
+  static String CURRENT_LOCATION_LABEL = "Current Location";
+
 
 
 
@@ -53,4 +57,8 @@ class Constants {
   static String img_add_circled_plus='assets/images/ic_plus_circle_outline_black_24dp.png';
   static String img_swap='assets/images/ic_swap.png';
   static String img_map_marker='assets/images/ic_map_marker.png';
+  static String img_map_marker_final='assets/images/ic_b.png';
+  static String img_map_marker_initial='assets/images/ic_a.png';
+  static String img_bag='assets/images/ic_hand_luggage.png';
+  static String img_luggage='assets/images/ic_luggage.png';
 }
