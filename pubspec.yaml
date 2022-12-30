@@ -61,6 +61,9 @@ dev_dependencies:
   http: ^0.13.5
   google_maps_flutter: ^2.2.2
   provider: ^6.0.4
+  flutter_credit_card: ^3.0.4
+  flutter_stripe: ^7.0.0
+
 
 
 # For information on the generic Dart part of this file, see the

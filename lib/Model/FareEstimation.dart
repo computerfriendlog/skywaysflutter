@@ -22,6 +22,27 @@ class FareEstimation{
   });
 
   factory FareEstimation.fromJson(Map<String, dynamic> json) {
+    if(json['orig_return_fare']!=null){
+      try{
+        json['orig_return_fare']=double.parse(json['orig_return_fare']).roundToDouble().toString();
+      }catch(e){}
+    }
+    if(json['return_fare']!=null){
+      try{
+        json['return_fare']=double.parse(json['return_fare']).roundToDouble().toString();
+      }catch(e){}
+    }
+    if(json['orig_price']!=null){
+      try{
+        json['orig_price']=double.parse(json['orig_price']).roundToDouble().toString();
+      }catch(e){}
+    }
+    if(json['price']!=null){
+      try{
+        json['price']=double.parse(json['price']).roundToDouble().toString();
+      }catch(e){}
+    }
+
     return FareEstimation(
       price: json['price'] as String ?? '',
       small_luggage: json['small_luggage'] as String ?? '',

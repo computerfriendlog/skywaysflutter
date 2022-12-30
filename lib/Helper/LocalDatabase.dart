@@ -21,7 +21,8 @@ class LocalDatabase {
   static String USER_PAYMENT_SOURCE = "payment_source";
   static String USER_POSTAL_CODE = "driverpostal_key";
   static String USER_MOBILE = "driver_mobile_key";
-  static String STARTED_JOB = "started_job_key";
+  static String STARTED_RIDE = "started_job_key";
+  static String STARTED_RIDE_RETURN = "started_job_key_return";
   static String SCREEN_OPEN_ON_NOTIFICATION = "screen_on_notify";
   static String FIREBASE_MSG_TOKEN = "push_notification_token";
   static String GOOGLE_MAP_KEY = "google_map_key";

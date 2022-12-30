@@ -230,8 +230,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void initData() async {
     controller_ac_name.text = name;
-    controller_mail.text = driver_mail;
-    controller_mobile.text = driver_phone;
+    controller_mail.text = user_mail;
+    controller_mobile.text = user_phone;
     controller_address.text =
         await LocalDatabase.getString(LocalDatabase.USER_ADDRESS);
     controller_countryCode.text =

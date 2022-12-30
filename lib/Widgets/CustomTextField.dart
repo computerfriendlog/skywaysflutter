@@ -6,7 +6,8 @@ class CustomTextField extends StatelessWidget {
   final double _width;
   final TextInputType keyboardType;
   bool? editAble=true;
-  CustomTextField(this._width, this.hint, this.label, this.keyboardType, this._controller,{this.editAble});
+  int? max_length;
+  CustomTextField(this._width, this.hint, this.label, this.keyboardType, this._controller,{this.editAble,this.max_length});
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +32,7 @@ class CustomTextField extends StatelessWidget {
                 cursorColor: Colors.grey,
                 controller: _controller,
                 keyboardType: keyboardType,
+                maxLength: max_length,
                 enabled: editAble,
                 style: const TextStyle(fontSize: 15, color: Colors.black),
                 decoration: InputDecoration(

@@ -3,10 +3,9 @@ class CountryCodes{
   static Map<String,dynamic> getCountryCodes(){
     return{
       "countries": [
-
         {
           "code": "+44",
-          "name": "United Kingdom"
+          "name": "United Kingdom",
         },
         {
           "code": "+7 840",
@@ -14,7 +13,8 @@ class CountryCodes{
         },
         {
           "code": "+93",
-          "name": "Afghanistan"
+          "name": "Afghanistan",
+
         },
         {
           "code": "+355",
@@ -62,15 +62,18 @@ class CountryCodes{
         },
         {
           "code": "+61",
-          "name": "Australia"
+          "name": "Australia",
+
         },
         {
           "code": "+672",
-          "name": "Australian External Territories"
+          "name": "Australian External Territories",
+
         },
         {
           "code": "+43",
-          "name": "Austria"
+          "name": "Austria",
+
         },
         {
           "code": "+994",
@@ -82,11 +85,13 @@ class CountryCodes{
         },
         {
           "code": "+973",
-          "name": "Bahrain"
+          "name": "Bahrain",
+
         },
         {
           "code": "+880",
-          "name": "Bangladesh"
+          "name": "Bangladesh",
+
         },
         {
           "code": "+1 246",
@@ -102,11 +107,12 @@ class CountryCodes{
         },
         {
           "code": "+32",
-          "name": "Belgium"
+          "name": "Belgium",
+
         },
         {
           "code": "+501",
-          "name": "Belize"
+          "name": "Belize",
         },
         {
           "code": "+229",
@@ -118,7 +124,7 @@ class CountryCodes{
         },
         {
           "code": "+975",
-          "name": "Bhutan"
+          "name": "Bhutan",
         },
         {
           "code": "+591",
@@ -138,35 +144,40 @@ class CountryCodes{
         },
         {
           "code": "+246",
-          "name": "British Indian Ocean Territory"
+          "name": "British Indian Ocean Territory",
+
         },
         {
           "code": "+1 284",
-          "name": "British Virgin Islands"
+          "name": "British Virgin Islands",
+
         },
         {
           "code": "+673",
-          "name": "Brunei"
+          "name": "Brunei",
+
         },
         {
           "code": "+359",
-          "name": "Bulgaria"
+          "name": "Bulgaria",
+
         },
         {
           "code": "+226",
-          "name": "Burkina Faso"
+          "name": "Burkina Faso",
         },
         {
           "code": "+257",
-          "name": "Burundi"
+          "name": "Burundi",
+
         },
         {
           "code": "+855",
-          "name": "Cambodia"
+          "name": "Cambodia",
         },
         {
           "code": "+237",
-          "name": "Cameroon"
+          "name": "Cameroon",
         },
         {
           "code": "+1",

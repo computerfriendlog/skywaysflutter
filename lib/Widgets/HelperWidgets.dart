@@ -25,6 +25,12 @@ class HelperWidgets{
   static TextStyle text_heading_16_300(){
     return  const TextStyle(fontSize: 16,fontWeight: FontWeight.w300,color: Colors.black);
   }
+  static TextStyle text_heading_16_300_grey(){
+    return  const TextStyle(fontSize: 16,fontWeight: FontWeight.w300,color: Colors.grey);
+  }
+  static TextStyle text_heading_16bl_300(){
+    return  const TextStyle(fontSize: 16,fontWeight: FontWeight.w500,color: Colors.black);
+  }
 
   static TextStyle text_home_time_time_picker(bool hint){
     return TextStyle(fontWeight: FontWeight.w400,fontSize: 14,

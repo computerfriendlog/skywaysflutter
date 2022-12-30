@@ -41,8 +41,8 @@ String name = '';
 String officeName = '';
 String driver_id = '';
 String password = '';
-String driver_phone = '';
-String driver_mail = '';
+String user_phone = '';
+String user_mail = '';
 String threat_level = '';
 String google_map_key_globle = '';
 bool isLogined = false;
@@ -90,6 +90,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     loadInitailData();
     getLocation();
+    date_ride=DateTime.now();
+    time_ride=TimeOfDay.now();
     _controller_pick_up.addListener(() {
       selectingPickup = true;
       if (_controller_pick_up.text.toString().length < 15) {
@@ -660,8 +662,8 @@ class _HomeScreenState extends State<HomeScreen> {
     name = await LocalDatabase.getString(LocalDatabase.NAME);
     driver_id = await LocalDatabase.getString(LocalDatabase.DRIVER_ID);
     password = await LocalDatabase.getString(LocalDatabase.USER_PASSWORD);
-    driver_phone = await LocalDatabase.getString(LocalDatabase.USER_MOBILE);
-    driver_mail = await LocalDatabase.getString(LocalDatabase.USER_EMAIL);
+    user_phone = await LocalDatabase.getString(LocalDatabase.USER_MOBILE);
+    user_mail = await LocalDatabase.getString(LocalDatabase.USER_EMAIL);
     isLogined = await LocalDatabase.isUserLogined();
     //threat_level = await LocalDatabase.getString(LocalDatabase.THREAT_LEVEL);
 

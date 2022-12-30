@@ -3,8 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:skywaysflutter/Provider/PlaceSuggestionProvider.dart';
+import 'package:skywaysflutter/Screens/AddPaymentCardScreen.dart';
+import 'package:skywaysflutter/Screens/MyRidesScreen.dart';
 import 'package:skywaysflutter/Screens/ProfileScreen.dart';
 import 'package:skywaysflutter/Screens/RideProcess/BookingConfirmScreen.dart';
+import 'package:skywaysflutter/Screens/RideProcess/PaymentScreen.dart';
 import 'package:skywaysflutter/Screens/SelectVehicleScreen.dart';
 import 'package:skywaysflutter/Screens/SupportScreen.dart';
 import 'Screens/HomeScreen.dart';
@@ -13,7 +16,7 @@ import 'Screens/SplashScreen.dart';
 import 'package:provider/provider.dart';
 import 'Services/LocalNotificationService.dart';
 //final LocalNotificationService localNotificationService = LocalNotificationService();
-
+import 'package:flutter_stripe/flutter_stripe.dart';
 ///  to do
 /// forgot password
 ///
@@ -22,6 +25,7 @@ import 'Services/LocalNotificationService.dart';
 //Change parameters{Google api key, office name, BASE_URL, } from lib->Helper->Constants.dart
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  Stripe.publishableKey='pk_test_51MKbx2LedsQzFZxXwlyax3PfZBfTTDUfH66feboIuYmUkwEXlDsNfKLBrIgaQ4dk91oKeo9LvTxykgiVOi3MvOWH00Xf2dvZqd';
   //localNotificationService.initializNotifications();
   //bg.BackgroundGeolocation.registerHeadlessTask(headlessTask);
   //await AndroidAlarmManager.initialize();
@@ -63,6 +67,9 @@ class MyApp extends StatelessWidget {
             ProfileScreen.routeName: (ctx) => ProfileScreen(),
             SelectVehicleScreen.routeName: (ctx) => SelectVehicleScreen(),
             BookingConfirmScreen.routeName: (ctx) => BookingConfirmScreen(),
+            PaymentScreen.routeName: (ctx) => PaymentScreen(),
+            AddPaymentCardScreen.routeName: (ctx) => AddPaymentCardScreen(),
+            MyRidesScreen.routeName: (ctx) => MyRidesScreen(),
           },
           home: SplashScreen(),
         ),
